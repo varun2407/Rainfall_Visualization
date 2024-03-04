@@ -1,0 +1,159 @@
+<html>
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      color: white;
+      background-color: black;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    svg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Comparison between Rainfall in 2022 vs 2023. (East Boston)</h1>
+  <svg width="1000" height="700"></svg>
+
+  <script>
+    const svg = d3.select("svg"),
+          margin = { top: 50, right: 50, bottom: 50, left: 50 },
+          width = +svg.attr("width") - margin.left - margin.right,
+          height = +svg.attr("height") - margin.top - margin.bottom,
+          g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    const parseDate = d3.timeParse("%B");
+
+    const xScale = d3.scaleBand()
+        .range([0, width])
+        .padding(0.1);
+
+    const yScale = d3.scaleLinear()
+        .range([height, 0]);
+
+    const xAxis = d3.axisBottom()
+        .scale(xScale);
+
+    const yAxis = d3.axisLeft()
+        .scale(yScale);
+
+    const line = d3.line()
+        .x(d => xScale(d.Month))
+        .y(d => yScale(d.Inches));
+
+    const data2022 = [
+      {"Month":"January","Inches":1.82},
+      {"Month":"February","Inches":3.61},
+      {"Month":"March","Inches":3.01},
+      {"Month":"April","Inches":2.67},
+      {"Month":"May","Inches":1.22},
+      {"Month":"June","Inches":2.66},
+      {"Month":"July","Inches":0.81},
+      {"Month":"August","Inches":1.60},
+      {"Month":"September","Inches":2.55},
+      {"Month":"October","Inches":3.89},
+      {"Month":"November","Inches":2.71},
+      {"Month":"December","Inches":4.53}
+    ];
+
+    const data2023 = [
+      {"Month":"January","Inches":6.09},
+      {"Month":"February","Inches":1.68},
+      {"Month":"March","Inches":4.96},
+      {"Month":"April","Inches":3.45},
+      {"Month":"May","Inches":1.96},
+      {"Month":"June","Inches":2.28},
+      {"Month":"July","Inches":8.81},
+      {"Month":"August","Inches":6.20},
+      {"Month":"September","Inches":4.08},
+      {"Month":"October","Inches":2.20},
+      {"Month":"November","Inches":1.96},
+      {"Month":"December","Inches":6.80}
+    ];
+
+    // Format the data
+    data2022.forEach(d => {
+      d.Inches = +d.Inches;
+    });
+
+    data2023.forEach(d => {
+      d.Inches = +d.Inches;
+    });
+
+    // Set the domains
+    xScale.domain(data2022.map(d => d.Month));
+    yScale.domain([0, Math.max(d3.max(data2022, d => d.Inches), d3.max(data2023, d => d.Inches))]);
+
+    // Draw the x-axis
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Draw the y-axis
+    g.append("g")
+        .call(yAxis);
+
+    // Draw the 2022 line
+    g.append("path")
+        .datum(data2022)
+        .attr("fill", "none")
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+    // Draw the 2023 line
+    g.append("path")
+        .datum(data2023)
+        .attr("fill", "none")
+        .attr("stroke", "green")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+    // Add labels for data points for 2022
+    g.selectAll(".label-2022")
+      .data(data2022)
+      .enter().append("text")
+      .attr("class", "label-2022")
+      .attr("x", d => xScale(d.Month) + xScale.bandwidth() / 2)
+      .attr("y", d => yScale(d.Inches))
+      .text(d => d.Inches)
+      .attr("dy", "-0.5em")
+      .attr("text-anchor", "middle")
+      .attr("fill", "blue");
+
+    // Add labels for data points for 2023
+    g.selectAll(".label-2023")
+      .data(data2023)
+      .enter().append("text")
+      .attr("class", "label-2023")
+      .attr("x", d => xScale(d.Month) + xScale.bandwidth() / 2)
+      .attr("y", d => yScale(d.Inches))
+      .text(d => d.Inches)
+      .attr("dy", "-0.5em")
+      .attr("text-anchor", "middle")
+      .attr("fill", "green");
+
+    // Add axis labels
+    g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Inches");
+
+    g.append("text")
+      .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top) + ")")
+      .style("text-anchor", "middle")
+      .text("Month");
+  </script>
+</body>
+</html>
